@@ -1,11 +1,20 @@
 from repositories.person_repository import PersonRepository
 from entities.person import Person
+from entities.log import SystemLog
+from repositories.system_repository import SystemRepository
 
 dbPath = "/mnt/c/Users/User/databases/address_book.db"
 
 def main():
-    repo = PersonRepository(dbPath)
-    repo.createTable()
+    person_repo = PersonRepository(dbPath)
+    person_repo.createTable()
+
+    system_repo = SystemRepository(dbPath)
+    system_repo.createLogTable()
+    system_repo.createStatusTable()
+
+    test_log = SystemLog(level="INFO", message="Application started successfully.")
+    system_repo.insertLog(test_log)
 
     while True:
         print("\n=== Person Address Book ===")
@@ -13,6 +22,8 @@ def main():
         print("2. 전체 조회")
         print("3. 사람 수정")
         print("4. 사람 삭제")
+        print("5. 현재 시스템 상태 수집 및 기록")
+        print("6. 전체 시스템 로그 조회")
         print("0. 종료")
 
         choice = input("선택: ").strip()
@@ -23,12 +34,12 @@ def main():
                 pnumber = input("전화번호: ").strip()
 
                 person = Person(name=name, pnumber=pnumber)
-                repo.insert(person)
+                person_repo.insert(person)
 
                 print("저장 완료:", person)
 
             case "2":
-                persons = repo.findAll()
+                persons = person_repo.findAll()
                 print("\n--- 전체 목록 ---")
                 for p in persons:
                     print(p)
@@ -40,7 +51,7 @@ def main():
                     print("ID는 숫자로 입력해주세요")
                     continue
 
-                person_to_update = repo.findOne(target_id)
+                person_to_update = person_repo.findOne(target_id)
                 print(f"person is {person_to_update}")
 
                 if (person_to_update is None):
@@ -53,7 +64,7 @@ def main():
 
                 new_person = Person(name=new_name, pnumber=new_pnumber)
 
-                persons = repo.update(id=target_id, new_person=new_person)
+                persons = person_repo.update(id=target_id, new_person=new_person)
                 
                 print("수정이 완료되었습니다.")
                     
@@ -64,16 +75,33 @@ def main():
                     print("ID는 숫자로 입력해주세요")
                     continue
 
-                person_to_update = repo.findOne(target_id)
-                print(f"person is {person}")
+                person_to_update = person_repo.findOne(target_id)
+                print(f"person is {person_to_update}")
 
                 if (person_to_update is None):
                     print(f"ID {target_id}에 해당하는 정보가 없습니다.")
                     continue
                 
-                repo.delete(id=target_id)
+                person_repo.delete(id=target_id)
                 
                 print("삭제가 완료되었습니다")
+
+            case "5":
+                status = system_repo.collect_system_status()
+                system_repo.insertStatus(status)
+
+                print("시스템 상태 기록 완료")
+                print(status)
+
+                log_msg = f"System status recorded: CPU={status.cpu_usage}"
+                status_log = SystemLog(level="Info", message=log_msg)
+                system_repo.insertLog(status_log)
+
+            case "6":
+                logs = system_repo.findAllLogs()
+                print("\n-- 최신 시스템 로그 목록 --")
+                for l in logs[:10]:
+                    print(l)
 
             case "0":
                 print("프로그램 종료")
