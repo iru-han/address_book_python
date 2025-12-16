@@ -1,0 +1,103 @@
+import sqlite3
+from entities.person import Person
+
+class PersonRepository:
+    def __init__(self, dbPath: str):
+        self.dbPath = dbPath
+
+    def getConnection(self):
+        return sqlite3.connect(self.dbPath)
+
+    def createTable(self):
+        conn = self.getConnection()
+        cur = conn.cursor()
+
+        sql = """
+        CREATE TABLE IF NOT EXISTS Person (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            Name TEXT NOT NULL,
+            Pnumber TEXT NOT NULL
+        );
+        """
+
+        cur.execute(sql)
+        conn.commit()
+        conn.close()
+
+    def insert(self, person: Person):
+        conn = self.getConnection()
+        cur = conn.cursor()
+
+        sql = """
+        INSERT INTO Person (Name, Pnumber)
+        VALUES (?, ?);
+        """
+
+        cur.execute(sql, (person.name, person.pnumber))
+        conn.commit()
+
+        person.id = cur.lastrowid
+        conn.close()
+
+    def findOne(self, id: int) -> Person | None:
+        conn = self.getConnection()
+        cur = conn.cursor()
+
+        sql = "SELECT ID, Name, Pnumber FROM Person WHERE id=?;"
+        cur.execute(sql, (id,))
+
+        print(f"cur : {cur}")
+
+        row = cur.fetchone()
+        conn.close()
+
+        print(f"findOne Person : {row}")
+
+        if row:
+            return Person(row[0], row[1], row[2])
+        else:
+            return None
+
+    def findAll(self) -> list[Person]:
+        conn = self.getConnection()
+        cur = conn.cursor()
+
+        sql = "SELECT ID, Name, Pnumber FROM Person ORDER BY ID;"
+        cur.execute(sql)
+
+        persons = []
+        for row in cur:  # (ID, Name, Pnumber)
+            persons.append(Person(row[0], row[1], row[2]))
+
+        conn.close()
+        return persons
+    
+    def update(self, id: int, new_person: Person):
+        conn = self.getConnection()
+        cur = conn.cursor()
+
+        sql = """
+        UPDATE Person SET Name=?, Pnumber=?
+        WHERE ID=?;
+        """
+
+        cur.execute(sql, (new_person.name, new_person.pnumber, id))
+        conn.commit()
+
+        new_person.id = cur.lastrowid
+        print(f"cur.lastrowid : {cur.lastrowid}")
+        conn.close()
+    
+    def delete(self, id: int):
+        conn = self.getConnection()
+        cur = conn.cursor()
+
+        sql = """
+        DELETE FROM Person
+        WHERE ID=?;
+        """
+
+        cur.execute(sql, (id,))
+        conn.commit()
+
+        conn.close()
