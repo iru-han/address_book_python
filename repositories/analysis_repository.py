@@ -56,6 +56,7 @@ class AnalysisRepository:
             # 분석 대상 기간 설정
             now = datetime.datetime.now()
             start_time = (now - datetime.timedelta(hours=hours)).strftime("%Y-%m-%d %H:%M:%S")
+            print("start_time is ", start_time)
             
             # 1. 중요 이벤트 카운트 (보내주신 로그 특징 반영)
             # 시간 역전 현상 (Time Jump)
@@ -69,6 +70,31 @@ class AnalysisRepository:
             # 서비스 재시작 관련 (Started/Restarted 키워드)
             cursor.execute("SELECT COUNT(*) FROM linux_log WHERE (message LIKE '%Started %' OR message LIKE '%restarted%') AND timestamp > ?", (start_time,))
             restarts = cursor.fetchone()[0]
+            
+            cursor.execute("""
+                SELECT timestamp, level, component, message 
+                FROM linux_log 
+                WHERE timestamp > ?
+                ORDER BY timestamp
+            """, (start_time,))
+            linux_logs = cursor.fetchall()
+            for row in linux_logs:
+                timestamp, level, component, message = row
+                print(timestamp, level, component, message)
+
+                KEYWORDS = (
+                    "Started ",
+                    "restarted",
+                    "Stopped ",
+                    "Stopping ",
+                    "Failed ",
+                    "Reloaded ",
+                )
+
+                msg = message  # 대소문자 구분 OK일 때
+
+                if any(k in msg for k in KEYWORDS):
+                    ...
 
             # 2. 상세 내역 (최근 5건의 중요 경고)
             cursor.execute("""
