@@ -2,10 +2,14 @@ from repositories.equipment_repository import EquipmentRepository
 from entities.equipment import Equipment
 from repositories.system_repository import SystemRepository
 
-from repositories.system_analysis_repository import SystemAnalysisRepository 
-from repositories.sensor_repository import SensorRepository
+from entities.linux_log_entry import LinuxLogEntry
+from entities.sensor_data import SensorData
 
-dbPath = "/mnt/c/Users/User/databases/equipment.db"
+from repositories.linux_log_repository import LinuxLogRepository
+from repositories.sensor_repository import SensorRepository
+from repositories.analysis_repository import AnalysisRepository
+
+from base.base_path import dbPath
 
 def main():
     equipment_repo = EquipmentRepository(dbPath)
@@ -15,20 +19,27 @@ def main():
     system_repo.createLogTable()
     system_repo.createStatusTable()
 
-    system_analysis_repo = SystemAnalysisRepository(dbPath)
+    # Linux 로그 및 센서 Repository 초기화
+    linux_log_repo = LinuxLogRepository(dbPath)
+    linux_log_repo.createLogTable()
+
     sensor_repo = SensorRepository(dbPath)
-    sensor_repo.createSensorTable()
+    sensor_repo.createSensorTable() # sensor_data 테이블 생성
+
+    # 3. [신규] 분석 전용 Repository 초기화
+    analysis_repo = AnalysisRepository(dbPath) # 분석은 데이터만 사용하므로 테이블 생성 없음
 
     while True:
-        print("\n=== Equipment ===")
+        print("\n=== System Control Panel ===")
         print("1. 장비 추가")
         print("2. 전체 조회")
         print("3. 장비 수정")
         print("4. 장비 삭제")
-        print("5. 전체 시스템 로그 조회")
-        print("6. 시스템 부하 분석 (CPU/Memory 요약)")  # 신규
-        print("7. 가상 센서 데이터 조회 (시뮬레이터)") # 신규
-        print("8. Linux 이벤트 로그 요약 분석")         # 신규
+        print("--- 모니터링 및 분석 ---")
+        print("5. (PSUTIL) 호스트 상태 로그 조회")
+        print("6. 시스템 부하 분석 (CPU/Memory 요약)")
+        print("7. 가상 센서 데이터 조회")
+        print("8. Linux 이벤트 로그 요약 분석")
         print("0. 종료")
 
         choice = input("선택: ").strip()
@@ -93,25 +104,34 @@ def main():
 
             case "5":
                 logs = system_repo.findAllLogs()
-                print("\n-- 최신 시스템 로그 목록 --")
+                print("\n-- 최신 PSUTIL 로그 목록 --")
                 for l in logs[:10]:
                     print(l)
-
             case "6":
-                print("\n--- 시스템 부하 분석 결과 ---")
-                # system_analysis_repo.summarize_recent_load() 메서드 호출
-                # 분석 결과 출력 로직 추가
-                
-            case "7":
-                print("\n--- 가상 센서 데이터 (최신) ---")
-                # sensor_repo.findAllSensorData() 메서드 호출
-                # 센서 값 출력 로직 추가
-                
-            case "8":
-                print("\n--- Linux 이벤트 요약 분석 ---")
-                # log_analysis_repo.summarize_syslog() 메서드 호출
-                # 예제 화면처럼 출력 로직 추가 (서비스 재시작, 네트워크 이벤트 등)
+                # 신규: PSUTIL 데이터를 분석하는 AnalysisRepository 사용
+                print("\n--- 호스트 서버 부하 분석 (최근 1시간) ---")
+                summary = analysis_repo.summarize_system_load(hours=1)
+                # 🚨 analysis_repo에 구현 예정인 메서드를 호출하고 결과 출력
+                # print(f"최대 CPU: {summary['max_cpu']}%, 평균 메모리 부족 횟수: {summary['mem_warns']}")
+                print("분석 기능 구현 예정") 
 
+            case "7":
+                # 신규: SensorRepository를 통해 가상 센서 데이터 조회
+                print("\n--- 최신 가상 센서 데이터 ---")
+                latest_sensors = sensor_repo.findLatest(limit=10)
+                # 🚨 sensor_repo에 구현 예정인 메서드를 호출하고 결과 출력
+                # for s in latest_sensors:
+                #     print(s)
+                print("가상 센서 조회 기능 구현 예정")
+
+            case "8":
+                # 신규: Linux Log 데이터를 분석하는 AnalysisRepository 사용
+                print("\n--- Linux 이벤트 로그 요약 (syslog/auth) ---")
+                log_summary = analysis_repo.analyze_syslog_events(hours=6)
+                # 🚨 analysis_repo에 구현 예정인 메서드를 호출하고 결과 출력
+                # print(f"서비스 재시작: {log_summary['restart_count']}건")
+                print("Linux 로그 분석 기능 구현 예정")
+                
             case "0":
                 print("프로그램 종료")
                 break

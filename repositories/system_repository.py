@@ -6,7 +6,6 @@ from entities.system_log import SystemLog, SystemStatus
 # pip install psutil 로 설치 필요
 import psutil 
 
-dbPath = "/mnt/c/Users/User/databases/equipment.db"
 
 class SystemRepository:
     def __init__(self, dbPath: str):

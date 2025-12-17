@@ -1,0 +1,1 @@
+dbPath = "/mnt/c/Users/User/databases/equipment.db"

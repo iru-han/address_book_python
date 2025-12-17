@@ -6,7 +6,7 @@ from entities.system_log import SystemLog
 
 import datetime
 
-dbPath = "/mnt/c/Users/User/databases/address_book.db"
+from base.base_path import dbPath
 
 def collect_and_record():
     """상태를 한 번 수집하고 DB에 기록하는 함수."""
