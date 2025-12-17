@@ -83,7 +83,7 @@ class SystemRepository:
         conn.close()
         return logs
     
-    def collect_system_status() -> SystemStatus:
+    def collect_system_status(self) -> SystemStatus:
         """CPU 사용률과 사용 가능 메모리 정보를 수집하여 SystemStatus 객체로 반환합니다."""
         # psutil 라이브러리 사용을 가정
         
