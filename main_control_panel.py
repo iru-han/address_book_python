@@ -5,8 +5,8 @@ from repositories.system_repository import SystemRepository
 dbPath = "/mnt/c/Users/User/databases/equipment.db"
 
 def main():
-    person_repo = EquipmentRepository(dbPath)
-    person_repo.createTable()
+    equipment_repo = EquipmentRepository(dbPath)
+    equipment_repo.createTable()
 
     system_repo = SystemRepository(dbPath)
     system_repo.createLogTable()
@@ -29,14 +29,14 @@ def main():
                 pnumber = input("전화번호: ").strip()
 
                 person = Equipment(name=name, pnumber=pnumber)
-                person_repo.insert(person)
+                equipment_repo.insert(person)
 
                 print("저장 완료:", person)
 
             case "2":
-                persons = person_repo.findAll()
+                equipments = equipment_repo.findAll()
                 print("\n--- 전체 목록 ---")
-                for p in persons:
+                for p in equipments:
                     print(p)
                     
             case "3":
@@ -46,7 +46,7 @@ def main():
                     print("ID는 숫자로 입력해주세요")
                     continue
 
-                person_to_update = person_repo.findOne(target_id)
+                person_to_update = equipment_repo.findOne(target_id)
                 print(f"person is {person_to_update}")
 
                 if (person_to_update is None):
@@ -59,7 +59,7 @@ def main():
 
                 new_person = Equipment(name=new_name, pnumber=new_pnumber)
 
-                persons = person_repo.update(id=target_id, new_person=new_person)
+                equipments = equipment_repo.update(id=target_id, new_person=new_person)
                 
                 print("수정이 완료되었습니다.")
                     
@@ -70,14 +70,14 @@ def main():
                     print("ID는 숫자로 입력해주세요")
                     continue
 
-                person_to_update = person_repo.findOne(target_id)
+                person_to_update = equipment_repo.findOne(target_id)
                 print(f"person is {person_to_update}")
 
                 if (person_to_update is None):
                     print(f"ID {target_id}에 해당하는 정보가 없습니다.")
                     continue
                 
-                person_repo.delete(id=target_id)
+                equipment_repo.delete(id=target_id)
                 
                 print("삭제가 완료되었습니다")
 
