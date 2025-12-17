@@ -4,6 +4,7 @@ from entities.linux_log_entry import LinuxLogEntry
 class LinuxLogRepository:
     def __init__(self, db_path):
         self.db_path = db_path
+        print("db_path is ", db_path)
         
     def createLogTable(self):
         conn = sqlite3.connect(self.db_path)

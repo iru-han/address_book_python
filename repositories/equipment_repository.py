@@ -2,11 +2,11 @@ import sqlite3
 from entities.equipment import Equipment
 
 class EquipmentRepository:
-    def __init__(self, dbPath: str):
-        self.dbPath = dbPath
+    def __init__(self, DB_PATH: str):
+        self.DB_PATH = DB_PATH
 
     def getConnection(self):
-        return sqlite3.connect(self.dbPath)
+        return sqlite3.connect(self.DB_PATH)
 
     def createTable(self):
         conn = self.getConnection()

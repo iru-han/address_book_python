@@ -1,16 +1,20 @@
-# collect_status_batch.py 파일 (SystemRepository와 같은 폴더에 있다고 가정)
-
-from repositories.system_repository import SystemRepository
-from entities.system_log import SystemLog
-# psutil 및 기타 필요한 모듈 import
-
+import os
+import sys
 import datetime
 
-from base.base_path import dbPath
+# 프로젝트 루트 추가
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from entities.system_log import SystemLog
+from repositories.system_repository import SystemRepository
+from base.base_path import DB_PATH
+# psutil 및 기타 필요한 모듈 import
+
+
 
 def collect_and_record():
     """상태를 한 번 수집하고 DB에 기록하는 함수."""
-    system_repo = SystemRepository(dbPath)
+    system_repo = SystemRepository(DB_PATH)
     
     try:
         status = system_repo.collect_system_status()

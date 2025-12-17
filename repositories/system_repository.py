@@ -8,11 +8,11 @@ import psutil
 
 
 class SystemRepository:
-    def __init__(self, dbPath: str):
-        self.dbPath = dbPath
+    def __init__(self, DB_PATH: str):
+        self.DB_PATH = DB_PATH
 
     def getConnection(self):
-        return sqlite3.connect(self.dbPath)
+        return sqlite3.connect(self.DB_PATH)
         
     def createLogTable(self):
         """시스템 로그 테이블을 생성합니다."""

@@ -9,25 +9,25 @@ from repositories.linux_log_repository import LinuxLogRepository
 from repositories.sensor_repository import SensorRepository
 from repositories.analysis_repository import AnalysisRepository
 
-from base.base_path import dbPath
+from base.base_path import DB_PATH
 
 def main():
-    equipment_repo = EquipmentRepository(dbPath)
+    equipment_repo = EquipmentRepository(DB_PATH)
     equipment_repo.createTable()
 
-    system_repo = SystemRepository(dbPath)
+    system_repo = SystemRepository(DB_PATH)
     system_repo.createLogTable()
     system_repo.createStatusTable()
 
     # Linux 로그 및 센서 Repository 초기화
-    linux_log_repo = LinuxLogRepository(dbPath)
+    linux_log_repo = LinuxLogRepository(DB_PATH)
     linux_log_repo.createLogTable()
 
-    sensor_repo = SensorRepository(dbPath)
+    sensor_repo = SensorRepository(DB_PATH)
     sensor_repo.createSensorTable() # sensor_data 테이블 생성
 
     # 3. [신규] 분석 전용 Repository 초기화
-    analysis_repo = AnalysisRepository(dbPath) # 분석은 데이터만 사용하므로 테이블 생성 없음
+    analysis_repo = AnalysisRepository(DB_PATH) # 분석은 데이터만 사용하므로 테이블 생성 없음
 
     while True:
         print("\n=== System Control Panel ===")

@@ -1,1 +1,1 @@
-dbPath = "/mnt/c/Users/User/databases/equipment.db"
+DB_PATH = "/mnt/c/Users/User/databases/equipment.db"
