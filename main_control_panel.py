@@ -2,6 +2,9 @@ from repositories.equipment_repository import EquipmentRepository
 from entities.equipment import Equipment
 from repositories.system_repository import SystemRepository
 
+from repositories.system_analysis_repository import SystemAnalysisRepository 
+from repositories.sensor_repository import SensorRepository
+
 dbPath = "/mnt/c/Users/User/databases/equipment.db"
 
 def main():
@@ -12,6 +15,10 @@ def main():
     system_repo.createLogTable()
     system_repo.createStatusTable()
 
+    system_analysis_repo = SystemAnalysisRepository(dbPath)
+    sensor_repo = SensorRepository(dbPath)
+    sensor_repo.createSensorTable()
+
     while True:
         print("\n=== Equipment ===")
         print("1. 장비 추가")
@@ -19,6 +26,9 @@ def main():
         print("3. 장비 수정")
         print("4. 장비 삭제")
         print("5. 전체 시스템 로그 조회")
+        print("6. 시스템 부하 분석 (CPU/Memory 요약)")  # 신규
+        print("7. 가상 센서 데이터 조회 (시뮬레이터)") # 신규
+        print("8. Linux 이벤트 로그 요약 분석")         # 신규
         print("0. 종료")
 
         choice = input("선택: ").strip()
@@ -86,6 +96,21 @@ def main():
                 print("\n-- 최신 시스템 로그 목록 --")
                 for l in logs[:10]:
                     print(l)
+
+            case "6":
+                print("\n--- 시스템 부하 분석 결과 ---")
+                # system_analysis_repo.summarize_recent_load() 메서드 호출
+                # 분석 결과 출력 로직 추가
+                
+            case "7":
+                print("\n--- 가상 센서 데이터 (최신) ---")
+                # sensor_repo.findAllSensorData() 메서드 호출
+                # 센서 값 출력 로직 추가
+                
+            case "8":
+                print("\n--- Linux 이벤트 요약 분석 ---")
+                # log_analysis_repo.summarize_syslog() 메서드 호출
+                # 예제 화면처럼 출력 로직 추가 (서비스 재시작, 네트워크 이벤트 등)
 
             case "0":
                 print("프로그램 종료")
