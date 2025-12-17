@@ -1,11 +1,11 @@
-from repositories.person_repository import PersonRepository
-from entities.person import Person
+from repositories.equipment_repository import EquipmentRepository
+from entities.equipment import Equipment
 from repositories.system_repository import SystemRepository
 
-dbPath = "/mnt/c/Users/User/databases/address_book.db"
+dbPath = "/mnt/c/Users/User/databases/equipment.db"
 
 def main():
-    person_repo = PersonRepository(dbPath)
+    person_repo = EquipmentRepository(dbPath)
     person_repo.createTable()
 
     system_repo = SystemRepository(dbPath)
@@ -13,11 +13,11 @@ def main():
     system_repo.createStatusTable()
 
     while True:
-        print("\n=== Person Address Book ===")
-        print("1. 사람 추가")
+        print("\n=== Equipment ===")
+        print("1. 장비 추가")
         print("2. 전체 조회")
-        print("3. 사람 수정")
-        print("4. 사람 삭제")
+        print("3. 장비 수정")
+        print("4. 장비 삭제")
         print("5. 전체 시스템 로그 조회")
         print("0. 종료")
 
@@ -28,7 +28,7 @@ def main():
                 name = input("이름: ").strip()
                 pnumber = input("전화번호: ").strip()
 
-                person = Person(name=name, pnumber=pnumber)
+                person = Equipment(name=name, pnumber=pnumber)
                 person_repo.insert(person)
 
                 print("저장 완료:", person)
@@ -41,7 +41,7 @@ def main():
                     
             case "3":
                 try:
-                    target_id = int(input("수정할 사람의 ID: "))
+                    target_id = int(input("수정할 장비의 ID: "))
                 except ValueError:
                     print("ID는 숫자로 입력해주세요")
                     continue
@@ -57,7 +57,7 @@ def main():
                 new_name = input(f"새 이름 (현재: {person_to_update.name}): ").strip()
                 new_pnumber = input(f"새 전화번호 (현재: {person_to_update.pnumber}): ").strip()
 
-                new_person = Person(name=new_name, pnumber=new_pnumber)
+                new_person = Equipment(name=new_name, pnumber=new_pnumber)
 
                 persons = person_repo.update(id=target_id, new_person=new_person)
                 
@@ -65,7 +65,7 @@ def main():
                     
             case "4":
                 try:
-                    target_id = int(input("수정할 사람의 ID: "))
+                    target_id = int(input("수정할 장비의 ID: "))
                 except ValueError:
                     print("ID는 숫자로 입력해주세요")
                     continue

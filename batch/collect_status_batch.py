@@ -1,7 +1,7 @@
 # collect_status_batch.py 파일 (SystemRepository와 같은 폴더에 있다고 가정)
 
 from repositories.system_repository import SystemRepository
-from entities.log import SystemLog
+from entities.system_log import SystemLog
 # psutil 및 기타 필요한 모듈 import
 
 import datetime

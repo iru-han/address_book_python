@@ -1,14 +1,12 @@
 import sqlite3
-import datetime
-from entities.log import SystemLog, SystemStatus
+from entities.system_log import SystemLog, SystemStatus
 
 
 # 필요한 라이브러리 (CPU/메모리 정보를 얻기 위해 psutil 사용을 가정)
 # pip install psutil 로 설치 필요
 import psutil 
 
-dbPath = "/mnt/c/Users/User/databases/test7.db"
-
+dbPath = "/mnt/c/Users/User/databases/equipment.db"
 
 class SystemRepository:
     def __init__(self, dbPath: str):

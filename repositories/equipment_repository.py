@@ -1,7 +1,7 @@
 import sqlite3
-from entities.person import Person
+from entities.equipment import Equipment
 
-class PersonRepository:
+class EquipmentRepository:
     def __init__(self, dbPath: str):
         self.dbPath = dbPath
 
@@ -13,7 +13,7 @@ class PersonRepository:
         cur = conn.cursor()
 
         sql = """
-        CREATE TABLE IF NOT EXISTS Person (
+        CREATE TABLE IF NOT EXISTS Equipment (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             Name TEXT NOT NULL,
             Pnumber TEXT NOT NULL
@@ -24,12 +24,12 @@ class PersonRepository:
         conn.commit()
         conn.close()
 
-    def insert(self, person: Person):
+    def insert(self, person: Equipment):
         conn = self.getConnection()
         cur = conn.cursor()
 
         sql = """
-        INSERT INTO Person (Name, Pnumber)
+        INSERT INTO Equipment (Name, Pnumber)
         VALUES (?, ?);
         """
 
@@ -39,11 +39,11 @@ class PersonRepository:
         person.id = cur.lastrowid
         conn.close()
 
-    def findOne(self, id: int) -> Person | None:
+    def findOne(self, id: int) -> Equipment | None:
         conn = self.getConnection()
         cur = conn.cursor()
 
-        sql = "SELECT ID, Name, Pnumber FROM Person WHERE id=?;"
+        sql = "SELECT ID, Name, Pnumber FROM Equipment WHERE id=?;"
         cur.execute(sql, (id,))
 
         print(f"cur : {cur}")
@@ -51,33 +51,33 @@ class PersonRepository:
         row = cur.fetchone()
         conn.close()
 
-        print(f"findOne Person : {row}")
+        print(f"findOne Equipment : {row}")
 
         if row:
-            return Person(row[0], row[1], row[2])
+            return Equipment(row[0], row[1], row[2])
         else:
             return None
 
-    def findAll(self) -> list[Person]:
+    def findAll(self) -> list[Equipment]:
         conn = self.getConnection()
         cur = conn.cursor()
 
-        sql = "SELECT ID, Name, Pnumber FROM Person ORDER BY ID;"
+        sql = "SELECT ID, Name, Pnumber FROM Equipment ORDER BY ID;"
         cur.execute(sql)
 
         persons = []
         for row in cur:  # (ID, Name, Pnumber)
-            persons.append(Person(row[0], row[1], row[2]))
+            persons.append(Equipment(row[0], row[1], row[2]))
 
         conn.close()
         return persons
     
-    def update(self, id: int, new_person: Person):
+    def update(self, id: int, new_person: Equipment):
         conn = self.getConnection()
         cur = conn.cursor()
 
         sql = """
-        UPDATE Person SET Name=?, Pnumber=?
+        UPDATE Equipment SET Name=?, Pnumber=?
         WHERE ID=?;
         """
 
@@ -93,7 +93,7 @@ class PersonRepository:
         cur = conn.cursor()
 
         sql = """
-        DELETE FROM Person
+        DELETE FROM Equipment
         WHERE ID=?;
         """
 

@@ -1,4 +1,4 @@
-#!/home/robot/work/sql1/address_book_python/venv/bin/python3
+#!/home/robot/work/sql1/main_control_panel/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
