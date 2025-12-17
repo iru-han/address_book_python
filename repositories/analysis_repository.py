@@ -5,11 +5,47 @@ class AnalysisRepository:
     def __init__(self, db_path):
         self.db_path = db_path
 
-    # PSUTIL 데이터 분석 (메뉴 6번)
+# repositories/analysis_repository.py 내부
+
     def summarize_system_load(self, hours=1):
-        """SystemStatus 테이블을 기반으로 최근 X시간 부하 요약"""
-        # ... (구현 예정: MAX/AVG CPU, 메모리 부족 횟수)
-        pass
+        """SystemStatus 테이블을 기반으로 최근 X시간 부하 요약 (메뉴 6번)"""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        # 분석 시작 시간 계산
+        start_time = (datetime.datetime.now() - datetime.timedelta(hours=hours)).strftime("%Y-%m-%d %H:%M:%S")
+
+        # 1. CPU 및 메모리 통계 계산
+        # memory_free는 MB 단위라고 가정 (psutil 수집 시 설정에 따름)
+        cursor.execute("""
+            SELECT 
+                MAX(cpu_usage) as max_cpu,
+                AVG(cpu_usage) as avg_cpu,
+                MIN(memory_free) as min_mem,
+                COUNT(CASE WHEN cpu_usage > 80 THEN 1 END) as cpu_high_alerts,
+                COUNT(CASE WHEN memory_free < 512 THEN 1 END) as mem_low_alerts
+            FROM system_status 
+            WHERE timestamp > ?
+        """, (start_time,))
+        
+        row = cursor.fetchone()
+        
+        # 데이터가 없을 경우를 위한 기본값 처리
+        if row and row['max_cpu'] is not None:
+            summary = {
+                "max_cpu": round(row['max_cpu'], 2),
+                "avg_cpu": round(row['avg_cpu'], 2),
+                "min_mem": round(row['min_mem'], 2),
+                "cpu_alerts": row['cpu_high_alerts'],
+                "mem_alerts": row['mem_low_alerts'],
+                "data_found": True
+            }
+        else:
+            summary = {"data_found": False}
+
+        conn.close()
+        return summary
         
     # Linux Log 분석 (메뉴 8번)
     def analyze_syslog_events(self, hours=6):
@@ -54,6 +90,24 @@ class AnalysisRepository:
             }
 
     # Sensor Data 분석 (추가 분석 메뉴용)
+# repositories/analysis_repository.py 내부
+
     def summarize_sensor_stats(self):
-        # ... (구현 예정: 평균 온도, LED ON 시간 비율 등)
-        pass
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        # 최근 24시간 내 평균 온습도 및 조도 분석
+        cursor.execute("""
+            SELECT 
+                AVG(temperature) as avg_temp,
+                MAX(temperature) as max_temp,
+                AVG(humidity) as avg_hum,
+                COUNT(CASE WHEN temperature > 28 THEN 1 END) as heat_alerts
+            FROM sensor_data 
+            WHERE timestamp > datetime('now', '-1 day')
+        """)
+        
+        stats = cursor.fetchone()
+        conn.close()
+        return stats

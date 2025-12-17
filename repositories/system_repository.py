@@ -20,31 +20,29 @@ class SystemRepository:
         cur = conn.cursor()
 
         sql = """
-        CREATE TABLE IF NOT EXISTS SystemLog (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            Timestamp TEXT NOT NULL,
-            Level TEXT NOT NULL,
-            Message TEXT NOT NULL
+        CREATE TABLE IF NOT EXISTS system_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT NOT NULL,
+            level TEXT NOT NULL,
+            message TEXT NOT NULL
         );
         """
         cur.execute(sql)
         conn.commit()
         conn.close()
 
+    # repositories/system_repository.py
     def createStatusTable(self):
-        """시스템 상태 정보 테이블을 생성합니다."""
-        conn = self.getConnection()
-        cur = conn.cursor()
-
-        sql = """
-        CREATE TABLE IF NOT EXISTS SystemStatus (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            Timestamp TEXT NOT NULL,
-            CpuUsage REAL NOT NULL,
-            MemoryFree INTEGER NOT NULL
-        );
-        """
-        cur.execute(sql)
+        conn = sqlite3.connect(self.DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS system_status (  -- 이름이 정확해야 함
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT,
+                cpu_usage REAL,
+                memory_free REAL
+            )
+        """)
         conn.commit()
         conn.close()
 
@@ -61,7 +59,7 @@ class SystemRepository:
         """상태 데이터를 DB에 삽입합니다."""
         conn = self.getConnection()
         cur = conn.cursor()
-        sql = "INSERT INTO SystemStatus (Timestamp, CpuUsage, MemoryFree) VALUES (?, ?, ?);"
+        sql = "INSERT INTO system_status (timestamp, cpu_usage, memory_free) VALUES (?, ?, ?);"
         cur.execute(sql, (status.timestamp, status.cpu_usage, status.memory_free))
         conn.commit()
         conn.close()
@@ -70,7 +68,7 @@ class SystemRepository:
         """모든 로그를 조회합니다."""
         conn = self.getConnection()
         cur = conn.cursor()
-        sql = "SELECT ID, Level, Message, Timestamp FROM SystemLog ORDER BY ID DESC;"
+        sql = "SELECT id, level, message, timestamp FROM system_log ORDER BY id DESC;"
         cur.execute(sql)
         
         logs = []

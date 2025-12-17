@@ -31,7 +31,29 @@ class SensorRepository:
         conn.commit()
         conn.close()
 
+# repositories/sensor_repository.py 내부
+
     def findLatest(self, limit=10):
-        # 최신 센서 데이터 10개 조회 기능
-        # ... (구현 예정)
-        pass
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # 가장 최근에 기록된 센서 데이터부터 조회
+        cursor.execute("""
+            SELECT id, timestamp, led_status, temperature, humidity, light_level 
+            FROM sensor_data 
+            ORDER BY timestamp DESC LIMIT ?
+        """, (limit,))
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        # SensorData 객체 리스트로 변환하여 반환
+        return [SensorData(
+            id=row['id'],
+            timestamp=row['timestamp'],
+            led_status=row['led_status'],
+            temperature=row['temperature'],
+            humidity=row['humidity'],
+            light_level=row['light_level']
+        ) for row in rows]
