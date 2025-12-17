@@ -1,30 +1,8 @@
 from repositories.person_repository import PersonRepository
 from entities.person import Person
-from entities.log import SystemLog
 from repositories.system_repository import SystemRepository
-import threading
-import schedule
-import time
 
 dbPath = "/mnt/c/Users/User/databases/address_book.db"
-
-def run_status_collection(system_repo):
-    try:
-        status = system_repo.collect_system_status()
-        system_repo.insertStatus(status)
-
-        log_msg = f"Automatic status recorded: CPU={status.cpu_usage}%"
-        status_log = SystemLog(level="INFO", message=log_msg)
-        system_repo.insertLog(status_log)
-
-        print(f"[자동 수집] {status.timestamp}: 상태 기록 완료")
-    except Exception as e:
-        print(f"[자동 수집 오류] {e}")
-
-def schedule_loop():
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
 
 def main():
     person_repo = PersonRepository(dbPath)
@@ -33,12 +11,6 @@ def main():
     system_repo = SystemRepository(dbPath)
     system_repo.createLogTable()
     system_repo.createStatusTable()
-    
-    schedule.every(5).seconds.do(run_status_collection, system_repo)
-
-    scheduler_thread = threading.Thread(target=schedule_loop)
-    scheduler_thread.daemon = True
-    scheduler_thread.start()
 
     while True:
         print("\n=== Person Address Book ===")
